@@ -11,7 +11,7 @@ A small tutorial and code snippets about how to add Custom genes to the cellrang
 
 ### 5. Copy the refdata-gex-GRCh38-2024-A/ genes / genes.gtf into: Cellranger/ custom/ genes
 
-     Leave these two files untouched until concatinating the new gene info into them. They are very large and you will most likely not be able to open them with the normal text edit software, but we can concat. new lines (new gene info) into these big files. 
+Leave these two files untouched until concatinating the new gene info into them. They are very large and you will most likely not be able to open them with the normal text edit software, but we can concat. new lines (new gene info) into these big files. 
 
 ### 6. In the folders  Cellranger/ custom/ fasta and genes, there are already files called: custom_transgenes.fa and custom_transgenes.gtf. 
 
@@ -66,7 +66,7 @@ These entries are space seperated. so take care to only have single spaces betwe
 
 - The second entry is the "chromosome" here we add "custom" to not get cell ranger confused. Basicly stating this gene is found on a custom chromosome. 
 
-- "Exon" stays as it, as well as the "1".
+- "Exon" stays as it, as well as the "1". The first "+" indicates the reading direction of the gene. Most trasgenes are read on the positive strand (in plasmids indicated as clockwise). If you do know your gene is read in reverse, add a "-" here. 
 
 - The second thing we need to adjust is the Gene length. Here we enter the number we got in step 7. **This is important!**
 
