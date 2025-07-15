@@ -32,19 +32,16 @@ This tutorial explains how to add custom genes (e.g., transgenes, reporters) to 
 
 ## Step-by-Step Instructions
 
-### 1. Copy the `custom` folder into your Cell Ranger folder
-
-### 2. Locate your reference folder (e.g., `refdata-gex-GRCh38-2024-A`)
-
-### 3. Identify the `genes` and `fasta` subfolders in the reference
-
-### 4. Copy the reference files:
+1. Copy the `custom` folder into your Cell Ranger folder.
+2. Locate your reference folder (e.g., `refdata-gex-GRCh38-2024-A`)
+3. Identify the `genes` and `fasta` subfolders in the reference
+4. Copy the reference files:
 - `refdata-gex-GRCh38-2024-A/fasta/genome.fa` → `Cellranger/custom/fasta/`
 - `refdata-gex-GRCh38-2024-A/genes/genes.gtf` → `Cellranger/custom/genes/`
 
 > **Note:** Leave these files untouched until you concatenate the new gene info. They are large and may not open in standard text editors.
 
-### 5. Prepare your custom gene files
+5. Prepare your custom gene files
 - `custom/fasta/custom_transgenes.fa`: Add your custom gene sequences in FASTA format.
 - `custom/genes/custom_transgenes.gtf`: Add your custom gene annotations in GTF format.
 
@@ -69,7 +66,7 @@ ZsGreen1	custom	exon	1	696	.	+	.	gene_id "ZSGREEN1"; gene_version "1"; transcrip
 - The exon length (columns 4-5) must match the sequence length.
 - Adjust other fields as needed for your gene.
 
-### 6. Concatenate custom entries to the reference files
+6. Concatenate custom entries to the reference files
 
 In the `genes` folder:
 ```bash
@@ -81,7 +78,7 @@ In the `fasta` folder:
 cat custom_transgenes.fa >> genome.fa
 ```
 
-### 7. Build the new reference with Cell Ranger
+7. Build the new reference with Cell Ranger
 
 From the main Cell Ranger folder:
 ```bash
