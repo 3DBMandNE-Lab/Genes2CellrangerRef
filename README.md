@@ -1,106 +1,107 @@
 # Genes2CellrangerRef
-A small tutorial and code snippets about how to add Custom genes to the cellranger reference.
 
-### 1. Copy the "custom" folder into you Cellranger folder
+A guide and resource for adding custom genes (transgenes) to a Cell Ranger reference genome. This repository provides example files, directory structure, and step-by-step instructions for integrating new gene sequences into your Cell Ranger workflow.
 
-### 2. Search for your (human) refernence file folder. named eg **"refdata-gex-GRCh38-2024-A"**
+---
 
-### 3. There are two subfolders you are intrested in: **"genes"** and **"fasta"**
+## Project Structure
 
-### 4. Copy the refdata-gex-GRCh38-2024-A/ fasta / genome.fa into: Cellranger/ custom/ fasta
-
-### 5. Copy the refdata-gex-GRCh38-2024-A/ genes / genes.gtf into: Cellranger/ custom/ genes
-
-Leave these two files untouched until concatinating the new gene info into them. They are very large and you will most likely not be able to open them with the normal text edit software, but we can concat. new lines (new gene info) into these big files. 
-
-### 6. In the folders  Cellranger/ custom/ fasta and genes, there are already files called: custom_transgenes.fa and custom_transgenes.gtf. 
-
-### 7. Lets start with custom_transgenes.fa in the fasta folder: 
-
-- Open the file via: 
-```bash
-cd  ~/Cellranger/custom/fasta
-nano custom_transgenes.fa
+```
+custom/
+  fasta/
+    custom_transgenes.fa         # FASTA file with custom gene sequences
+    genome.fa.fai                # FASTA index (from reference)
+  genes/
+    custom_transgenes.gtf        # GTF file with custom gene annotations
+  individual gene sequences/
+    AAV2 ITR.txt, EGFP_AAV.txt, ...  # Individual gene sequence files
+README.md
 ```
 
-- the format will be like this: 
+---
+
+## Overview
+
+This tutorial explains how to add custom genes (e.g., transgenes, reporters) to an existing Cell Ranger reference. You will:
+- Copy your reference genome and annotation files
+- Add your custom gene sequences and annotations
+- Concatenate them to the reference files
+- Build a new reference with Cell Ranger
+
+---
+
+## Step-by-Step Instructions
+
+### 1. Copy the `custom` folder into your Cell Ranger folder
+
+### 2. Locate your reference folder (e.g., `refdata-gex-GRCh38-2024-A`)
+
+### 3. Identify the `genes` and `fasta` subfolders in the reference
+
+### 4. Copy the reference files:
+- `refdata-gex-GRCh38-2024-A/fasta/genome.fa` → `Cellranger/custom/fasta/`
+- `refdata-gex-GRCh38-2024-A/genes/genes.gtf` → `Cellranger/custom/genes/`
+
+> **Note:** Leave these files untouched until you concatenate the new gene info. They are large and may not open in standard text editors.
+
+### 5. Prepare your custom gene files
+- `custom/fasta/custom_transgenes.fa`: Add your custom gene sequences in FASTA format.
+- `custom/genes/custom_transgenes.gtf`: Add your custom gene annotations in GTF format.
+
+#### Example `custom_transgenes.fa` format:
 ```
 >ZsGreen1
 ATGGCCCAGTCC...
 >ZsYellow1
 ATGGCCCACAGC...
 ```
+- The header (`>GeneName`) must match the gene name used in the GTF file.
+- The sequence is the full nucleotide sequence.
+- Remove any non-new entries to avoid duplicates.
 
--> Here : you need to mention your gene name exactly how you will want it to show up later and copy the full nucleotide sequence right below it. 
-- Take a note of the number of nucleotides it is long you will need it later.
-
-eg. Easy way in python:
-``` python
- len("ATGGCCCACAGC...")
+#### Example `custom_transgenes.gtf` format:
 ```
-- remove every other entry which is not new. (To avoid repeats)
+ZsGreen1	custom	exon	1	696	.	+	.	gene_id "ZSGREEN1"; gene_version "1"; transcript_id "ZSGREEN1-001"; ...
+```
+- Fields are tab-separated. Use single spaces within the attributes field.
+- The gene name must match the FASTA entry.
+- The second column is `custom` (chromosome name).
+- The exon length (columns 4-5) must match the sequence length.
+- Adjust other fields as needed for your gene.
 
-- write out the file by pressing "ctrl + O", press enter, and close nano with "ctrl + X"
+### 6. Concatenate custom entries to the reference files
 
-### 8. Now onto the custom_transgenes.gtf in the "genes" folder. 
-
-
-- Open the file via: 
+In the `genes` folder:
 ```bash
-cd  ~/Cellranger/custom/genes
-nano custom_transgenes.gtf
-```
-
-- the format will be like this: 
-
-```
-ZsGreen1	custom	exon	1	696	.	+	.	gene_id "ZSGREEN1"; gene_version "1"; transcript_id "ZSGREEN1-001"; transcript_version "1"; gene_type "protein_coding"; gene_name "ZsGreen1"; transcript_type "protein_coding"; transcript_name "ZsGreen1-001"; exon_number 1; exon_id "ZSGREEN1-E001"; exon_version "1"; level 1; tag "manual_annotation";
-
-mCherry	custom	exon	1	711	.	+	.	gene_id "MCHERRY"; gene_version "1"; transcript_id "MCHERRY-001"; transcript_version "1"; gene_type "protein_coding"; gene_name "mCherry"; transcript_type "protein_coding"; transcript_name "mCherry-001"; exon_number 1; exon_id "MCHERRY-E001"; exon_version "1"; level 1; tag "manual_annotation";
-
-...
-```
-These entries are space seperated. so take care to only have single spaces between each entry. 
-
-- The inial entry is the gene name. **It has to be** the same one you used in the **custom_transgenes.fa** file. **This is important!**
-
-- The second entry is the "chromosome" here we add "custom" to not get cell ranger confused. Basicly stating this gene is found on a custom chromosome. 
-
-- "Exon" stays as it, as well as the "1". The first "+" indicates the reading direction of the gene. Most trasgenes are read on the positive strand (in plasmids indicated as clockwise). If you do know your gene is read in reverse, add a "-" here. 
-
-- The second thing we need to adjust is the Gene length. Here we enter the number we got in step 7. **This is important!**
-
-- You can now adjust some other variables in this entry for your custom gene. Like other times the gene name is mentioned. Just replace them with your custom gene name. 
-
-- remove every other entry which is not new. (To avoid repeats)
-
-### 9. Now we are ready to concatinate. Stay in the genes folder (in terminal) and: 
-
-```bash 
-# ~/Cellranger/custom/genes
 cat custom_transgenes.gtf >> genes.gtf
 ```
 
-### 10. Go in to the fasta folder and: 
-
-```bash 
-# ~/Cellranger/custom/fasta
+In the `fasta` folder:
+```bash
 cat custom_transgenes.fa >> genome.fa
 ```
 
-### 11. Let cellranger stitch things together 
+### 7. Build the new reference with Cell Ranger
 
-- Go into the main Cellranger folder and run: 
-
+From the main Cell Ranger folder:
 ```bash
-./cellranger mkref   --genome=GRCh38_with_transgenes   --fasta=custom/fasta/genome.fa   --genes=custom/genes/genes.gtf
-
+./cellranger mkref \
+  --genome=GRCh38_with_transgenes \
+  --fasta=custom/fasta/genome.fa \
+  --genes=custom/genes/genes.gtf
 ```
 
-### 12. If you did everything right you are DONE!!!
+---
 
-- common mistakes are: 
-    - too many spaces between the entries in custom_genes.gtf
-    - wrong gene length mentioned in custom_genes.gtf
-    - missmatch in the gene name used between the two files
+## Troubleshooting & Tips
+
+- Ensure gene names match exactly between FASTA and GTF files.
+- The exon length in the GTF must match the nucleotide count in the FASTA.
+- Use only single spaces between attributes in the GTF.
+- Common mistakes:
+  - Extra spaces or tabs in GTF
+  - Incorrect gene length
+  - Name mismatches
+- Use command-line tools (e.g., `wc`, `awk`, `grep`) to check file formats and lengths.
+
 
